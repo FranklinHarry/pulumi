@@ -334,9 +334,9 @@ jobs:
           mkdir "$PWD/nuget"
           ls "$PWD/nuget"
       - run: |
-          echo "dotnet nuget add source $PWD/nuget"
-          dotnet nuget add source $PWD/nuget || echo "failed with $PWD/nuget"
-          dotnet nuget add source "D:\\a\\pulumi\\pulumi\\nuget" || echo "failed with D:\\a\\pulumi\\pulumi\\nuget"
+          P=$(python scripts/normpath $PWD/nuget)
+          echo "normed path: $P"
+          dotnet nuget add source $P
 
   # windows-build:
   #   name: Windows Build + Test
