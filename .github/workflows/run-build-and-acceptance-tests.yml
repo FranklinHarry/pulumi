@@ -321,6 +321,22 @@ jobs:
         run: |
           goteststats -statistic test-time test-results/*.json | head -n 100
 
+  windows-build
+    name: Debug NuGet issue on Windows
+    runs-on: windows-latest
+  steps:
+    - name: Set up DotNet ${{ matrix.dotnet-version }}
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: ${{ matrix.dotnet-version }}
+    - run: |
+        echo "PWD=$PWD
+        mkdir "$PWD/nuget"
+        ls "$PWD/nuget"
+    - run: |
+        echo "dotnet nuget add source $PWD/nuget"
+        dotnet nuget add source $PWD/nuget
+
   # windows-build:
   #   name: Windows Build + Test
   #   strategy:
