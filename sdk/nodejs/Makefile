@@ -18,10 +18,10 @@ include ../../build/common.mk
 export PATH:=$(shell yarn bin 2>/dev/null):$(PATH)
 
 lint::
-	./node_modules/.bin/eslint -c .eslintrc.js --ext .ts .
+	eslint -c .eslintrc.js --ext .ts .
 
 build_package::
-	./node_modules/.bin/tsc
+	yarn run tsc
 	cp tests/runtime/jsClosureCases_8.js bin/tests/runtime
 	cp tests/runtime/jsClosureCases_10_4.js bin/tests/runtime
 	cp -R tests/automation/data/. bin/tests/automation/data/
@@ -47,15 +47,15 @@ install_plugin:: build
 install:: install_package install_plugin
 
 istanbul_tests:: $(TEST_ALL_DEPS)
-	$(RUN_TESTSUITE) istanbul ./node_modules/.bin/istanbul test --print none _mocha -- --timeout 120000 --exclude 'bin/tests/automation/**/*.spec.js' 'bin/tests/**/*.spec.js'
-	./node_modules/.bin/istanbul report text-summary
-	./node_modules/.bin/istanbul report text
-	$(RUN_TESTSUITE) istanbul-with-mocks ./node_modules/.bin/istanbul test --print none _mocha -- 'bin/tests_with_mocks/**/*.spec.js'
+	$(RUN_TESTSUITE) istanbul istanbul test --print none _mocha -- --timeout 120000 --exclude 'bin/tests/automation/**/*.spec.js' 'bin/tests/**/*.spec.js'
+	istanbul report text-summary
+	istanbul report text
+	$(RUN_TESTSUITE) istanbul-with-mocks istanbul test --print none _mocha -- 'bin/tests_with_mocks/**/*.spec.js'
 
 auto_tests:: $(TEST_ALL_DEPS)
-	$(RUN_TESTSUITE) auto-nodejs ./node_modules/.bin/istanbul test --print none _mocha -- --timeout 120000 'bin/tests/automation/**/*.spec.js'
-	./node_modules/.bin/istanbul report text-summary
-	./node_modules/.bin/istanbul report text
+	$(RUN_TESTSUITE) auto-nodejs istanbul test --print none _mocha -- --timeout 120000 'bin/tests/automation/**/*.spec.js'
+	istanbul report text-summary
+	istanbul report text
 
 sxs_tests:: $(TEST_ALL_DEPS)
 	pushd tests/sxs_ts_3.6 && yarn ; tsc ; popd
