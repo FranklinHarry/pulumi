@@ -325,6 +325,10 @@ jobs:
     name: Debug NuGet issue on Windows
     runs-on: windows-latest
     steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ env.PR_COMMIT_SHA }}
       - name: Set up DotNet ${{ matrix.dotnet-version }}
         uses: actions/setup-dotnet@v1
         with:
@@ -334,6 +338,8 @@ jobs:
           mkdir "$PWD/nuget"
           ls "$PWD/nuget"
       - run: |
+          echo "PWD: $PWD"
+          echo "github.workspace: ${{ github.workspace }"
           P=$(./scripts/normpath $PWD/nuget)
           echo "normed path: $P"
           dotnet nuget add source $P
