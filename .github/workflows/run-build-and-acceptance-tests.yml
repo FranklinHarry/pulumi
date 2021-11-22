@@ -334,7 +334,7 @@ jobs:
           mkdir "$PWD/nuget"
           ls "$PWD/nuget"
       - run: |
-          P=$(python scripts/normpath.py $PWD/nuget)
+          P=$(./scripts/normpathy $PWD/nuget)
           echo "normed path: $P"
           dotnet nuget add source $P
 
