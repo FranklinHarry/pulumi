@@ -330,7 +330,7 @@ jobs:
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
       - run: |
-          echo "PWD=$PWD
+          echo "PWD=$PWD"
           mkdir "$PWD/nuget"
           ls "$PWD/nuget"
       - run: |
