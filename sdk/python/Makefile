@@ -50,14 +50,14 @@ test_fast:: $(TEST_ALL_DEPS)
 	$(GO_TEST) ${PROJECT_PKGS}
 	pipenv install -e ./env/src
 	# TODO the ignored test seems to fail in pytest but not unittest. Need to trackdown why
-	$(RUN_TESTSUITE) python/lib/test pipenv run pytest lib/test --ignore lib/test/automation --ignore lib/test/langhost/resource_thens/test_resource_thens.py
-	$(RUN_TESTSUITE) python/lib/test/langhost/resource_thens pipenv run python -m unittest lib/test/langhost/resource_thens/test_resource_thens.py
+	$(TESTSUITE_SKIPPED) python/lib/test || pipenv run pytest lib/test --ignore lib/test/automation --ignore lib/test/langhost/resource_thens/test_resource_thens.py
+	$(TESTSUITE_SKIPPED) python/lib/test/langhost/resource_thens || pipenv run python -m unittest lib/test/langhost/resource_thens/test_resource_thens.py
 	# Using python -m also adds lib/test_with_mocks to sys.path which avoids package resolution issues.
-	pushd lib/test_with_mocks; $(RUN_TESTSUITE) python/lib/test_with_mocks pipenv run python -m pytest; popd
+	pushd lib/test_with_mocks; $(TESTSUITE_SKIPPED) python/lib/test_with_mocks || pipenv run python -m pytest; popd
 
 test_auto:: test_fast $(TEST_ALL_DEPS)
 	# Note that this target depends on test-fast for the call to `pipenv run pip install`
-	$(RUN_TESTSUITE) auto-python pipenv run pytest lib/test/automation
+	$(TESTSUITE_SKIPPED) auto-python || pipenv run pytest lib/test/automation
 
 test_all:: test_fast test_auto
 
