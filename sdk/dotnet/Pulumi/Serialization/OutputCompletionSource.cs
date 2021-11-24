@@ -17,7 +17,7 @@ namespace Pulumi.Serialization
 
         void TrySetException(Exception exception);
         void TrySetDefaultResult(bool isKnown);
-        
+
         void SetStringValue(string value, bool isKnown);
         void SetValue(OutputData<object?> data);
     }
@@ -72,13 +72,15 @@ namespace Pulumi.Serialization
                 if (!propType.IsConstructedGenericType ||
                     propType.GetGenericTypeDefinition() != typeof(Output<>))
                 {
-                    throw new InvalidOperationException($"{propFullName} was not an Output<T>");
+                    continue;
+                    // throw new InvalidOperationException($"{propFullName} was not an Output<T>");
                 }
 
                 var setMethod = prop.DeclaringType!.GetMethod("set_" + prop.Name, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
                 if (setMethod == null)
                 {
-                    throw new InvalidOperationException($"{propFullName} did not have a 'set' method");
+                    continue;
+                    //throw new InvalidOperationException($"{propFullName} did not have a 'set' method");
                 }
 
                 var outputTypeArg = propType.GenericTypeArguments.Single();
