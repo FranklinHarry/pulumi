@@ -42,6 +42,22 @@ type typeDetails struct {
 	ptrInput   bool
 	arrayInput bool
 	mapInput   bool
+
+	ptrOutput   bool
+	arrayOutput bool
+	mapOutput   bool
+}
+
+func (d *typeDetails) markPtrInput() {
+	d.ptrInput, d.ptrOutput = true, true
+}
+
+func (d *typeDetails) markArrayInput() {
+	d.arrayInput, d.arrayOutput = true, true
+}
+
+func (d *typeDetails) markMapInput() {
+	d.mapInput, d.mapOutput = true, true
 }
 
 // Title converts the input string to a title case
@@ -975,12 +991,12 @@ func (pkg *pkgContext) genEnum(w io.Writer, enumType *schema.EnumType) error {
 	}
 
 	// Generate the array output
-	if details.arrayInput {
+	if details.arrayOutput {
 		genArrayOutput(w, name, name)
 	}
 
 	// Generate the map output.
-	if details.mapInput {
+	if details.mapOutput {
 		genMapOutput(w, name, name)
 	}
 
@@ -1304,7 +1320,7 @@ func (pkg *pkgContext) genOutputTypes(w io.Writer, genArgs genOutputTypesArgs) {
 		fmt.Fprintf(w, "}\n\n")
 	}
 
-	if details.ptrInput {
+	if details.ptrOutput {
 		genPtrOutput(w, name, name)
 
 		for _, p := range t.Properties {
@@ -1337,11 +1353,11 @@ func (pkg *pkgContext) genOutputTypes(w io.Writer, genArgs genOutputTypesArgs) {
 		}
 	}
 
-	if details.arrayInput {
+	if details.arrayOutput {
 		genArrayOutput(w, name, name)
 	}
 
-	if details.mapInput {
+	if details.mapOutput {
 		genMapOutput(w, name, name)
 	}
 }
@@ -2287,13 +2303,13 @@ func (pkg *pkgContext) genTypeRegistrations(w io.Writer, objTypes []*schema.Obje
 		}
 		name, details := pkg.tokenToType(obj.Token), pkg.detailsForType(obj)
 		fmt.Fprintf(w, "\tpulumi.RegisterOutputType(%sOutput{})\n", name)
-		if details.ptrInput {
+		if details.ptrOutput {
 			fmt.Fprintf(w, "\tpulumi.RegisterOutputType(%sPtrOutput{})\n", name)
 		}
-		if details.arrayInput {
+		if details.arrayOutput {
 			fmt.Fprintf(w, "\tpulumi.RegisterOutputType(%sArrayOutput{})\n", name)
 		}
-		if details.mapInput {
+		if details.mapOutput {
 			fmt.Fprintf(w, "\tpulumi.RegisterOutputType(%sMapOutput{})\n", name)
 		}
 	}
@@ -2337,10 +2353,10 @@ func (pkg *pkgContext) genEnumRegistrations(w io.Writer) {
 		name, details := pkg.tokenToEnum(e.Token), pkg.detailsForType(e)
 		fmt.Fprintf(w, "\tpulumi.RegisterOutputType(%sOutput{})\n", name)
 		fmt.Fprintf(w, "\tpulumi.RegisterOutputType(%sPtrOutput{})\n", name)
-		if details.arrayInput {
+		if details.arrayOutput {
 			fmt.Fprintf(w, "\tpulumi.RegisterOutputType(%sArrayOutput{})\n", name)
 		}
-		if details.mapInput {
+		if details.mapOutput {
 			fmt.Fprintf(w, "\tpulumi.RegisterOutputType(%sMapOutput{})\n", name)
 		}
 	}
@@ -2835,7 +2851,7 @@ func generatePackageContextMap(tool string, pkg *schema.Package, goInfo GoPackag
 				}
 				seen.Add(typ.Token)
 
-				pkg.detailsForType(typ).ptrInput = true
+				pkg.detailsForType(typ).markPtrInput()
 				populateDetailsForPropertyTypes(seen, typ.Properties, true)
 			}
 			pkg.schemaNames.Add(tokenToName(typ.Token))
@@ -2847,7 +2863,7 @@ func generatePackageContextMap(tool string, pkg *schema.Package, goInfo GoPackag
 				}
 				seen.Add(typ.Token)
 
-				pkg.detailsForType(typ).ptrInput = true
+				pkg.detailsForType(typ).markPtrInput()
 			}
 			pkg.schemaNames.Add(tokenToName(typ.Token))
 		case *schema.ArrayType:
@@ -2856,7 +2872,7 @@ func generatePackageContextMap(tool string, pkg *schema.Package, goInfo GoPackag
 			}
 			seen.Add(typ.String())
 
-			getPkgFromType(typ.ElementType).detailsForType(codegen.UnwrapType(typ.ElementType)).arrayInput = true
+			getPkgFromType(typ.ElementType).detailsForType(codegen.UnwrapType(typ.ElementType)).markArrayInput()
 			populateDetailsForTypes(seen, typ.ElementType, false)
 		case *schema.MapType:
 			if seen.Has(typ.String()) {
@@ -2864,7 +2880,7 @@ func generatePackageContextMap(tool string, pkg *schema.Package, goInfo GoPackag
 			}
 			seen.Add(typ.String())
 
-			getPkgFromType(typ.ElementType).detailsForType(codegen.UnwrapType(typ.ElementType)).mapInput = true
+			getPkgFromType(typ.ElementType).detailsForType(codegen.UnwrapType(typ.ElementType)).markMapInput()
 			populateDetailsForTypes(seen, typ.ElementType, false)
 		}
 	}
@@ -2879,9 +2895,9 @@ func generatePackageContextMap(tool string, pkg *schema.Package, goInfo GoPackag
 	for _, t := range pkg.Types {
 		switch typ := t.(type) {
 		case *schema.ArrayType:
-			getPkgFromType(typ.ElementType).detailsForType(typ.ElementType).arrayInput = true
+			getPkgFromType(typ.ElementType).detailsForType(typ.ElementType).markArrayInput()
 		case *schema.MapType:
-			getPkgFromType(typ.ElementType).detailsForType(typ.ElementType).mapInput = true
+			getPkgFromType(typ.ElementType).detailsForType(typ.ElementType).markMapInput()
 		case *schema.ObjectType:
 			pkg := getPkgFromToken(typ.Token)
 			if !typ.IsInputShape() {
