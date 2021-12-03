@@ -180,6 +180,11 @@ var sdkTests = []sdkTest{
 		Description:      "Regress pulumi/pulumi#8403",
 		SkipCompileCheck: codegen.NewStringSet(python, nodejs),
 	},
+	{
+		Directory:        "repro",
+		Description:      "azure repro",
+		SkipCompileCheck: codegen.NewStringSet(dotnet, python, nodejs, golang),
+	},
 }
 
 var genSDKOnly bool
