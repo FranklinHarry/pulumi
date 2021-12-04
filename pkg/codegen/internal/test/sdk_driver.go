@@ -181,9 +181,8 @@ var sdkTests = []sdkTest{
 		SkipCompileCheck: codegen.NewStringSet(python, nodejs),
 	},
 	{
-		Directory:        "repro",
-		Description:      "azure repro",
-		SkipCompileCheck: codegen.NewStringSet(dotnet, python, nodejs, golang),
+		Directory:   "azure-native-nested-types",
+		Description: "Condensed example of nested collection types from Azure Native",
 	},
 }
 
